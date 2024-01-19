@@ -469,6 +469,6 @@ impl Neg for Vec3 {
 
 impl Display for Vec3 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {} {}", self.x, self.y, self.z)
+        write!(f, "{:8.4}{:8.4}{:8.4}", self.x, self.y, self.z)
     }
 }

@@ -23,3 +23,8 @@ Generate the documentation:
 ```sh
 cargo doc --open
 ```
+
+## Display simulation
+```sh
+vmd -e script.tcl simulation.pdb
+```
