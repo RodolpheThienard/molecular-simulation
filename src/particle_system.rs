@@ -99,7 +99,7 @@ impl ParticleSystem {
 
         let N_dl = (3 * self.n_particles - 3) as f64;
         let kinetic_energy_0 = N_dl * K_BOLTZMANN * T_0;
-        let ratio = (kinetic_energy_0 / self.kinetic_energy).sqrt();
+        let ratio = kinetic_energy_0 / self.kinetic_energy;
 
         for P in self.kinetic_momentums.iter_mut() {
             *P *= ratio
