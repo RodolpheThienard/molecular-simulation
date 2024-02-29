@@ -62,44 +62,34 @@ impl ParticleSystem {
                 pos.next().unwrap(),
             ));
 
-            // Read kinetic momentums of current line
-            let mut km = line_km
-                .split_whitespace()
-                .skip(1)
-                .map(|val| val.parse::<f64>().expect("failed to parse {val}"));
-            system.kinetic_momentums.push(Vec3::new(
-                km.next().unwrap(),
-                km.next().unwrap(),
-                km.next().unwrap(),
-            ));
-
-            // Compute velocity of particle on the current line given its kinetic momentum:
-            //   km = v * m  =>  v = km / m
-            let last_km = system.kinetic_momentums.last().unwrap();
-            system.velocities.push(*last_km / M_I);
-
             // Initial force is set to zero
             system.forces.push(Vec3::zero());
         }
 
         system.n_particles = system.positions.len();
-
+        system.temperature = 300.0;
         // Make sure we have the same number of particles everywhere
         assert_eq!(system.n_particles, system.forces.len());
-        assert_eq!(system.n_particles, system.kinetic_momentums.len());
-        assert_eq!(system.n_particles, system.velocities.len());
 
         system
     }
 
     /// Initializes the kinetic momentum of each particle in the system.
     pub fn init_kinetic_momentums(&mut self) {
-        // Kinetic momentums shall be in the range [-1.0, 1.0]
-        let range = Uniform::from(-1.0_f64..1.0_f64);
-        let mut rng = rand::thread_rng();
-
+        // Add initialisation to iter into after
+        self.kinetic_momentums = vec![
+            Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0
+            };
+            self.n_particles
+        ];
         // For each particle, generate a random kinetic momentum (P_x, P_y, P_z)
         for P in self.kinetic_momentums.iter_mut() {
+            // Kinetic momentums shall be in the range [-1.0, 1.0]
+            let range = Uniform::from(-1_f64..1.0_f64);
+            let mut rng = rand::thread_rng();
             *P = Vec3::new(
                 range.sample(&mut rng),
                 range.sample(&mut rng),
@@ -110,6 +100,7 @@ impl ParticleSystem {
         // Perform the appropriate recalibrations
         self.first_kinetic_momentum_recalibration();
         self.second_kinetic_momentum_recalibration();
+        self.first_kinetic_momentum_recalibration();
     }
 
     fn first_kinetic_momentum_recalibration(&mut self) {

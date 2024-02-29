@@ -75,9 +75,11 @@ fn main() {
             );
         }
         AlgorithmKind::PeriodicalVerletVelocity => {
-            // system.init_kinetic_momentums();
+            system.init_kinetic_momentums();
             system.kinetic_energy = system.compute_kinetic_energy();
             system.temperature = system.compute_temperature();
+
+            println!("{:?}", system.temperature);
 
             // Compute forces using periodical Lennard-Jones algorithm.
             system.periodical_lennard_jones();
@@ -143,6 +145,7 @@ fn main() {
             // println!("temperature: t = {} k", system.temperature);
 
             // Compute forces using periodical Lennard-Jones algorithm.
+            system.init_kinetic_momentums();
             system.lennard_jones();
 
             // CSV header
