@@ -28,29 +28,19 @@ pub struct ParticleSystem {
 
 impl ParticleSystem {
     /// Initializes the positions of particles in a particle system from a configuration file.
-    pub fn from_config(filename_pos: PathBuf, filename_km: PathBuf) -> Self {
+    pub fn from_config(filename_pos: PathBuf) -> Self {
         let mut system = Self::default();
         let mut contents_pos = String::new();
-        let mut contents_km = String::new();
 
         let mut file_pos = File::open(filename_pos).expect("failed to open file `{filename}`");
         file_pos
             .read_to_string(&mut contents_pos)
             .expect("failed to read file `{filename}`");
 
-        let mut file_km = File::open(filename_km).expect("failed to open file `{filename}`");
-        file_km
-            .read_to_string(&mut contents_km)
-            .expect("failed to read file `{filename}`");
-
         // Read each line of the and parse its values
         // Skip the first line (header) and the first element of each line (particle ID,
         // not used here)
-        for (line_p, line_km) in contents_pos
-            .lines()
-            .skip(1)
-            .zip(contents_km.lines().skip(1))
-        {
+        for line_p in contents_pos.lines().skip(1) {
             // Read positions of current line
             let mut pos = line_p
                 .split_whitespace()
@@ -232,7 +222,6 @@ impl ParticleSystem {
                             continue;
                         }
                         let distance = R_STAR_SQ / distance;
-
                         let distance_cube = distance.powi(3);
                         let du_ij =
                             -48.0 * EPSILON_STAR * (distance.powi(4) * (distance_cube - 1.0));
@@ -286,10 +275,20 @@ impl ParticleSystem {
             .open(filename)
             .unwrap();
 
-        writeln!(file, "CRYST1  {L}  {L}  {L}  90.00  90.00  90.00  P  1").unwrap();
-        writeln!(file, "MODEL  {iteration}").unwrap();
+        writeln!(
+            file,
+            "CRYST1       32       32       32  90.00  90.00  90.00 P             1"
+        )
+        .unwrap();
+        writeln!(file, "MODEL        {iteration}").unwrap();
         for (i, p) in self.positions.iter().enumerate() {
-            writeln!(file, "ATOM  {}  C  0  {} MRES", i + 1, *p).unwrap();
+            writeln!(
+                file,
+                "ATOM  {:5}  C           0    {}                  MRES",
+                i + 1,
+                *p
+            )
+            .unwrap();
         }
         writeln!(file, "TER").unwrap();
         writeln!(file, "ENDMDL").unwrap();
