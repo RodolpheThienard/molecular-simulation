@@ -7,6 +7,7 @@ use rayon::prelude::*;
 
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
+use std::ops::RemAssign;
 use std::path::PathBuf;
 
 /// A particle system for molecular dynamics.
@@ -47,9 +48,9 @@ impl ParticleSystem {
                 .skip(1)
                 .map(|val| val.parse::<f64>().expect("failed to parse {val}"));
             system.positions.push(Vec3::new(
-                pos.next().unwrap(),
-                pos.next().unwrap(),
-                pos.next().unwrap(),
+                pos.next().unwrap() + L / 2.0,
+                pos.next().unwrap() + L / 2.0,
+                pos.next().unwrap() + L / 2.0,
             ));
 
             // Initial force is set to zero
@@ -123,10 +124,10 @@ impl ParticleSystem {
     ///   (1 / 2 * CONVERSION_FORCE) * ∑_i=1^N ((p_x^i)² + (p_y^i)² + (p_z^i)²) / m_i
     pub fn compute_kinetic_energy(&self) -> f64 {
         let mut sum = 0.0;
-        for P in self.kinetic_momentums.iter() {
-            sum += P.mag_sq() / M_I;
+        for p in &self.kinetic_momentums {
+            sum += p.mag_sq() / M_I;
         }
-        (CONVERSION_FORCE_2).recip() * sum
+        CONVERSION_FORCE_2.recip() * sum
     }
 
     pub fn compute_temperature(&self) -> f64 {
