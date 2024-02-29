@@ -48,10 +48,6 @@ pub struct Cli {
     #[arg(short, long, default_value_t = String::from("exam270323.xyz"))]
     pub position_configuration: String,
 
-    /// Path to configuration file with particles kinetic momentums.
-    #[arg(short, long, default_value_t = String::from("exam270323.mci"))]
-    pub kinetic_momentums_configuration: String,
-
     /// Path to output PDB file.
     #[arg(short, long, default_value_t = String::from("simulation.pdb"))]
     pub output: String,
